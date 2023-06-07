@@ -40,9 +40,14 @@ public class TetrisGUI extends Application {
         int[][] shape = randomType.getShape();
         int startX = (BOARD_WIDTH - shape[0].length) / 2;
         int startY = 0;
-        return new Tetromino(shape, startX, startY, randomType.getColor());
+        return new Tetromino(shape, startX, startY, randomColor());
     }     
     
+    private Color randomColor() {
+        Random random = new Random();
+        Color[] colors = {Color.CYAN, Color.BLUE, Color.ORANGE, Color.YELLOW, Color.GREEN, Color.MAGENTA, Color.RED};
+        return colors[random.nextInt(colors.length)];
+    }    
 
     @Override
     public void start(Stage primaryStage) {
@@ -90,17 +95,19 @@ public class TetrisGUI extends Application {
         int[][] shape = currentTetromino.getShape();
         int startX = currentTetromino.getX();
         int startY = currentTetromino.getY();
+        Color color = currentTetromino.getColor();
         for (int row = 0; row < shape.length; row++) {
             for (int col = 0; col < shape[row].length; col++) {
                 if (shape[row][col] == FILLED) {
                     Rectangle tile = new Rectangle(TILE_SIZE, TILE_SIZE);
                     tile.setStroke(Color.BLACK);
-                    tile.setFill(currentTetromino.getColor());
+                    tile.setFill(color);
                     gridPane.add(tile, startX + col, startY + row);
                 }
             }
         }
     }
+       
     
 
     private void moveDown() {

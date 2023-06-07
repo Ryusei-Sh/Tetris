@@ -1,13 +1,21 @@
+import javafx.scene.paint.Color;
+
 public class Tetromino {
     private int[][] shape;
     private int x;
     private int y;
+    private Color color;
 
-    public Tetromino(int[][] shape, int x, int y) {
+    public Tetromino(int[][] shape, int x, int y, Color color) {
         this.shape = shape;
         this.x = x;
         this.y = y;
+        this.color = color;
     }
+    
+    public Color getColor() {
+        return color;
+    }    
 
     public int[][] getShape() {
         return shape;
