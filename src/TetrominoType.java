@@ -25,5 +25,6 @@ public enum TetrominoType {
     public Color getColor() {
         return color;
     }
+    
 }
 

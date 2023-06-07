@@ -201,7 +201,7 @@ public class Tetris extends Application {
         int x = (BOARD_WIDTH - shape[0].length) / 2;
         int y = 0;
 
-        currentTetromino = new Tetromino(shape, x, y, Color.BLUE);
+        currentTetromino = new Tetromino(shape, x, y, Color.BLACK);
         if (!canMove(x, y, shape)) {
             isGameOver = true;
             System.out.println("Game Over");
