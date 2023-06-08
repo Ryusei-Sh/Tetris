@@ -12,50 +12,50 @@ public class Tetromino {
         this.y = y;
         this.color = color;
     }
-    
-    public Color getColor() {
-        return color;
-    }    
-
-    public int[][] getShape() {
-        return shape;
-    }
 
     public void setShape(int[][] shape) {
         this.shape = shape;
+    }
+
+    public int[][] getShape() {
+        return shape;
     }
 
     public int getX() {
         return x;
     }
 
-    public void setX(int x) {
-        this.x = x;
-    }
-
     public int getY() {
         return y;
     }
 
-    public void setY(int y) {
-        this.y = y;
-    }
-
-    public void moveLeft() {
-        x--;
-    }
-
-    public void moveRight() {
-        x++;
+    public Color getColor() {
+        return color;
     }
 
     public void moveDown() {
         y++;
     }
 
-    public int[][] rotate() {
-        // テトリミノの回転ロジックを実装
-        // ...
-        return shape;
+    public void moveRight() {
+        x++;
     }
+
+    public void moveLeft() {
+        x--;
+    }
+
+    public int[][] rotate() {
+        int rows = shape.length;
+        int cols = shape[0].length;
+        int[][] rotatedShape = new int[cols][rows];
+    
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < cols; col++) {
+                rotatedShape[col][rows - row - 1] = shape[row][col];
+            }
+        }
+    
+        return rotatedShape;
+    }    
 }

@@ -41,12 +41,71 @@ public class TetrisGUI extends Application {
         int startY = 0;
         Color color = randomType.getColor();
         return new Tetromino(shape, startX, startY, color);
-    }    
-    
+    }
+
+    // テトロミノの回転を行うメソッド
+    private void rotateTetromino() {
+        int[][] rotatedShape = currentTetromino.rotate();
+        if (canMoveTetromino(currentTetromino, currentTetromino.getX(), currentTetromino.getY(), rotatedShape)) {
+            currentTetromino.setShape(rotatedShape);
+            drawBoard();
+        }
+    }
+
+    // テトロミノの移動を行うメソッド
+    private void moveTetrominoDown() {
+        if (canMoveTetromino(currentTetromino, currentTetromino.getX(), currentTetromino.getY() + 1, currentTetromino.getShape())) {
+            currentTetromino.moveDown();
+            drawBoard();
+        } else {
+            mergeTetrominoWithBoard();
+            clearLines();
+            spawnNextTetromino();
+        }
+    }
+
+    private void moveTetrominoRight() {
+        if (canMoveTetromino(currentTetromino, currentTetromino.getX() + 1, currentTetromino.getY(), currentTetromino.getShape())) {
+            currentTetromino.moveRight();
+            drawBoard();
+        }
+    }
+
+    private void moveTetrominoLeft() {
+        if (canMoveTetromino(currentTetromino, currentTetromino.getX() - 1, currentTetromino.getY(), currentTetromino.getShape())) {
+            currentTetromino.moveLeft();
+            drawBoard();
+        }
+    }
+
+    // テトロミノが移動可能かを判定するメソッド
+    private boolean canMoveTetromino(Tetromino tetromino, int newX, int newY, int[][] shape) {
+        int tetrominoHeight = shape.length;
+        int tetrominoWidth = shape[0].length;
+
+        if (newX < 0 || newX + tetrominoWidth > BOARD_WIDTH || newY < 0 || newY + tetrominoHeight > BOARD_HEIGHT) {
+            return false;
+        }
+
+        for (int row = 0; row < tetrominoHeight; row++) {
+            for (int col = 0; col < tetrominoWidth; col++) {
+                if (shape[row][col] != EMPTY) {
+                    int boardX = newX + col;
+                    int boardY = newY + row;
+                    if (boardY >= 0 && (boardY >= BOARD_HEIGHT || board[boardY][boardX] == FILLED)) {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
     @Override
     public void start(Stage primaryStage) {
         gridPane = new GridPane();
-        
+
         drawBoard();
 
         Scene scene = new Scene(gridPane);
@@ -60,6 +119,17 @@ public class TetrisGUI extends Application {
                     moveTetrominoRight();
                 } else if (keyCode == KeyCode.DOWN) {
                     moveTetrominoDown();
+                } else if (keyCode == KeyCode.Z) {
+                    // テトロミノを回転させる処理
+                    rotateTetromino();
+                } else if (keyCode == KeyCode.UP) {
+                    // テトロミノを一番下まで落下させる処理
+                    while (canMoveTetromino(currentTetromino, currentTetromino.getX(), currentTetromino.getY() + 1)) {
+                        currentTetromino.moveDown();
+                    }
+                    mergeTetrominoWithBoard();
+                    clearLines();
+                    spawnNextTetromino();
                 }
             }
         });
@@ -122,7 +192,7 @@ public class TetrisGUI extends Application {
         int tetrominoWidth = shape[0].length;
         int tetrominoX = currentTetromino.getX();
         int tetrominoY = currentTetromino.getY();
-
+    
         for (int row = 0; row < tetrominoHeight; row++) {
             for (int col = 0; col < tetrominoWidth; col++) {
                 if (shape[row][col] == FILLED) {
@@ -135,6 +205,7 @@ public class TetrisGUI extends Application {
             }
         }
     }
+    
 
     private void drawBoard() {
         gridPane.getChildren().clear();
@@ -168,27 +239,6 @@ public class TetrisGUI extends Application {
         }
     }
 
-    private void moveTetrominoDown() {
-        if (canMoveTetromino(currentTetromino, currentTetromino.getX(), currentTetromino.getY() + 1)) {
-            currentTetromino.moveDown();
-            drawBoard();
-        }
-    }
-
-    private void moveTetrominoRight() {
-        if (canMoveTetromino(currentTetromino, currentTetromino.getX() + 1, currentTetromino.getY())) {
-            currentTetromino.moveRight();
-            drawBoard();
-        }
-    }
-
-    private void moveTetrominoLeft() {
-        if (canMoveTetromino(currentTetromino, currentTetromino.getX() - 1, currentTetromino.getY())) {
-            currentTetromino.moveLeft();
-            drawBoard();
-        }
-    }
-
     private boolean canMoveTetromino(Tetromino tetromino, int newX, int newY) {
         int[][] shape = tetromino.getShape();
         int tetrominoHeight = shape.length;
@@ -217,17 +267,21 @@ public class TetrisGUI extends Application {
 
     private void spawnNextTetromino() {
         currentTetromino = generateRandomTetromino();
-        if (!canMoveTetromino(currentTetromino, currentTetromino.getX(), currentTetromino.getY())) {
+        if (currentTetromino == null || !canMoveTetromino(currentTetromino, currentTetromino.getX(), currentTetromino.getY())) {
             // テトリミノを配置できない状態（ゲームオーバー）
             // ゲームオーバー処理を行い、ゲームをリセットするなどの処理を行うことができます
             // 以下はゲームをリセットする例です
             resetGame();
+        } else {
+            drawBoard();
         }
     }
+    
 
     private void resetGame() {
         board = new int[BOARD_HEIGHT][BOARD_WIDTH];
         currentTetromino = generateRandomTetromino();
+        drawBoard();
     }
 
     public static void main(String[] args) {

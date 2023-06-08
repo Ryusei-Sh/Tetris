@@ -11,10 +11,9 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
-
-import java.util.Random;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class Tetris extends Application {
     private static final int BOARD_WIDTH = 10;
@@ -72,6 +71,7 @@ public class Tetris extends Application {
         primaryStage.show();
 
         startGameLoop();
+        spawnNewTetromino();
     }
 
     private void startGameLoop() {
@@ -117,9 +117,7 @@ public class Tetris extends Application {
         } else {
             placeTetromino();
             clearLines();
-            if (!isGameOver) {
-                spawnNewTetromino();
-            }
+            spawnNewTetromino();
         }
     }
 
@@ -130,7 +128,7 @@ public class Tetris extends Application {
             updateBoard();
             drawBoard();
         }
-    }
+    }    
 
     private boolean canMove(int x, int y, int[][] shape) {
         for (int row = 0; row < shape.length; row++) {
@@ -145,22 +143,6 @@ public class Tetris extends Application {
             }
         }
         return true;
-    }
-
-    private void placeTetromino() {
-        int[][] shape = currentTetromino.getShape();
-        int x = currentTetromino.getX();
-        int y = currentTetromino.getY();
-
-        for (int row = 0; row < shape.length; row++) {
-            for (int col = 0; col < shape[row].length; col++) {
-                if (shape[row][col] != EMPTY) {
-                    int boardX = x + col;
-                    int boardY = y + row;
-                    board[boardY][boardX] = FILLED;
-                }
-            }
-        }
     }
 
     private void clearLines() {
@@ -212,6 +194,23 @@ public class Tetris extends Application {
         clearBoard();
         placeTetromino();
     }
+    
+    private void placeTetromino() {
+        int[][] shape = currentTetromino.getShape();
+        int x = currentTetromino.getX();
+        int y = currentTetromino.getY();
+    
+        for (int row = 0; row < shape.length; row++) {
+            for (int col = 0; col < shape[row].length; col++) {
+                if (shape[row][col] != EMPTY) {
+                    int boardX = x + col;
+                    int boardY = y + row;
+                    board[boardY][boardX] = FILLED;
+                }
+            }
+        }
+    }
+    
 
     private void clearBoard() {
         for (int row = 0; row < BOARD_HEIGHT; row++) {
@@ -238,7 +237,6 @@ public class Tetris extends Application {
     }
 
     public static void main(String[] args) {
-        launch(args);
+        TetrisGUI.launch(args);
     }
 }
-
