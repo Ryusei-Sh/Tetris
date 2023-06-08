@@ -162,7 +162,7 @@ public class TetrisGUI extends Application {
 
     private void clearLines() {
         List<Integer> fullLines = new ArrayList<>();
-
+    
         for (int row = 0; row < BOARD_HEIGHT; row++) {
             boolean lineIsFull = true;
             for (int col = 0; col < BOARD_WIDTH; col++) {
@@ -175,7 +175,7 @@ public class TetrisGUI extends Application {
                 fullLines.add(row);
             }
         }
-
+    
         for (Integer row : fullLines) {
             // ラインをクリア（上の行を一つ下にシフト）
             for (int i = row; i > 0; i--) {
