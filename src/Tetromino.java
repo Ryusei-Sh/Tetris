@@ -13,6 +13,10 @@ public class Tetromino {
         this.color = color;
     }
 
+    public void setColor(Color color) {
+        this.color = color;
+    }
+
     public void setShape(int[][] shape) {
         this.shape = shape;
     }

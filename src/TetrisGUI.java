@@ -29,6 +29,8 @@ public class TetrisGUI extends Application {
     private GridPane gridPane;
     private Button startButton;
     private Button endButton;
+    private Color[][] currentTetrominoColors = new Color[BOARD_HEIGHT][BOARD_WIDTH];
+
 
     public TetrisGUI() {
         board = new int[BOARD_HEIGHT][BOARD_WIDTH];
@@ -217,6 +219,7 @@ public class TetrisGUI extends Application {
         int tetrominoWidth = shape[0].length;
         int tetrominoX = currentTetromino.getX();
         int tetrominoY = currentTetromino.getY();
+        Color tetrominoColor = currentTetromino.getColor();
     
         for (int row = 0; row < tetrominoHeight; row++) {
             for (int col = 0; col < tetrominoWidth; col++) {
@@ -225,11 +228,14 @@ public class TetrisGUI extends Application {
                     int boardY = tetrominoY + row;
                     if (boardY >= 0 && boardY < BOARD_HEIGHT) {
                         board[boardY][boardX] = FILLED;
+                        // マージされた位置の色をテトロミノの色に設定
+                        currentTetrominoColors[boardY][boardX] = tetrominoColor;
                     }
                 }
             }
         }
     }
+    
     
 
     private void drawBoard() {
@@ -239,7 +245,7 @@ public class TetrisGUI extends Application {
                 Rectangle tile = new Rectangle(TILE_SIZE, TILE_SIZE);
                 tile.setStroke(Color.BLACK);
                 if (board[row][col] == FILLED) {
-                    tile.setFill(Color.BLACK);
+                    tile.setFill(currentTetrominoColors[row][col]); // マージされた位置の色を設定
                 } else {
                     tile.setFill(Color.WHITE);
                 }
