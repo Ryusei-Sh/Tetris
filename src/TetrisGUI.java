@@ -3,7 +3,9 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.event.EventHandler;
+import javafx.event.ActionEvent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button; 
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.GridPane;
@@ -25,6 +27,8 @@ public class TetrisGUI extends Application {
     private Tetromino currentTetromino;
     private int[][] board;
     private GridPane gridPane;
+    private Button startButton;
+    private Button endButton;
 
     public TetrisGUI() {
         board = new int[BOARD_HEIGHT][BOARD_WIDTH];
@@ -134,10 +138,31 @@ public class TetrisGUI extends Application {
             }
         });
 
+        startButton = new Button("Start"); // Startボタンを作成
+        startButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                startGame(); // Startボタンが押されたときの処理
+            }
+        });
+
+        endButton = new Button("End"); // Endボタンを作成
+        endButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                primaryStage.close(); // Endボタンが押されたときの処理
+            }
+        });
+
+        gridPane.add(startButton, 0, BOARD_HEIGHT + 1); // StartボタンをGridPaneの指定位置に追加
+        gridPane.add(endButton, 1, BOARD_HEIGHT + 1); // EndボタンをGridPaneの指定位置に追加
+
         primaryStage.setTitle("Tetris");
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
 
+    private void startGame() {
         // ゲームのループを開始
         Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
             moveDown();
