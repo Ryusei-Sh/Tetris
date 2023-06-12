@@ -11,12 +11,18 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import java.util.Random;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
+
 
 public class TetrisGUI extends Application {
     private static final int BOARD_WIDTH = 10;
@@ -27,6 +33,8 @@ public class TetrisGUI extends Application {
     private Tetromino currentTetromino;
     private int[][] board;
     private GridPane gridPane;
+    private Stage primaryStage; // primaryStage をフィールドとして宣言
+    private Timeline timeline; // timeline を宣言
     private Button startButton;
     private Button endButton;
     private Color[][] currentTetrominoColors = new Color[BOARD_HEIGHT][BOARD_WIDTH];
@@ -111,6 +119,7 @@ public class TetrisGUI extends Application {
     @Override
     public void start(Stage primaryStage) {
         gridPane = new GridPane();
+        this.primaryStage = primaryStage;
 
         drawBoard();
 
@@ -165,18 +174,57 @@ public class TetrisGUI extends Application {
     }
 
     private void startGame() {
-        // ゲームのループを開始
-        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
+        AtomicReference<Timeline> timelineRef = new AtomicReference<>();
+    
+        timelineRef.set(new Timeline(new KeyFrame(Duration.seconds(1), event -> {
             moveDown();
             drawBoard();
-        }));
-        timeline.setCycleCount(Animation.INDEFINITE);
-        timeline.play();
-
-        // テトロミノの生成
+            timelineRef.set(new Timeline()); // timeline を初期化
+    
+            if (isGameOver()) {
+                timelineRef.get().stop();
+                showGameOverScreen(primaryStage);
+            }
+        })));
+    
+        timelineRef.get().setCycleCount(Animation.INDEFINITE);
+        timelineRef.get().play();
+    
         spawnNextTetromino();
     }
+      
 
+    private void showGameOverScreen(Stage primaryStage) {
+        gridPane.getChildren().clear();
+    
+        // ゲームオーバーメッセージを表示するテキストノードを作成
+        Text gameOverText = new Text("Game Over");
+        gameOverText.setFont(Font.font("Arial", FontWeight.BOLD, 48));
+        gameOverText.setFill(Color.RED);
+        gameOverText.setTextAlignment(TextAlignment.CENTER);
+        gameOverText.setWrappingWidth(gridPane.getWidth());
+    
+        // 最初の画面に戻るボタンを作成
+        Button restartButton = new Button("Restart");
+        restartButton.setOnAction(event -> {
+            resetGame();
+            startGame();
+            showGameOverScreen(primaryStage);
+        });
+    
+        // GridPane にメッセージとボタンを追加
+        gridPane.add(gameOverText, 0, 0);
+        gridPane.add(restartButton, 0, 1);
+    }
+
+    private boolean isGameOver() {
+        int[][] shape = currentTetromino.getShape();
+        int tetrominoY = currentTetromino.getY();
+    
+        // テトロミノの一部が盤面の上にある場合はゲームオーバー
+        return tetrominoY <= 0 && Arrays.stream(shape[0]).anyMatch(cell -> cell == FILLED);
+    }
+    
     private void moveDown() {
         if (canMoveTetromino(currentTetromino, currentTetromino.getX(), currentTetromino.getY() + 1)) {
             currentTetromino.moveDown();
@@ -313,7 +361,12 @@ public class TetrisGUI extends Application {
         board = new int[BOARD_HEIGHT][BOARD_WIDTH];
         currentTetromino = generateRandomTetromino();
         drawBoard();
-    }
+        showGameOverScreen(primaryStage);
+        if (timeline != null) {
+            timeline.stop(); // timeline を停止
+            timeline = null; // null に設定
+        }
+    }    
 
     public static void main(String[] args) {
         launch(args);
